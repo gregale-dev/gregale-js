@@ -1,0 +1,45 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+/**
+ * Bounded, redacted span evidence. DB statements are sanitized fingerprints.
+ */
+export type DebugTelemetrySpan = {
+  trace_id: string;
+  span_id: string;
+  parent_span_id?: string;
+  name: string;
+  kind: string;
+  /**
+   * Redacted span start time used for the request waterfall.
+   */
+  start_time?: string;
+  /**
+   * Redacted span end time used for the request waterfall.
+   */
+  end_time?: string;
+  duration_nanos: number;
+  status?: string;
+  /**
+   * SQL fingerprint with literals redacted.
+   */
+  db_statement?: string;
+  /**
+   * Allowlisted platform-owned dependency classification.
+   */
+  dependency_type?: 'managed_binding' | 'outbound_integration' | 'guest_transport' | 'platform_internal' | 'app_dependency';
+  /**
+   * Allowlisted platform-owned dependency kind; raw span attributes are never returned.
+   */
+  dependency_kind?: string;
+  /**
+   * Grouping identity of an app_dependency span: database operation and table, HTTP host, RPC method or messaging destination. Never contains literals, paths, query strings or credentials.
+   */
+  dependency_name?: string;
+  /**
+   * Failure class of an error span, from the error.type attribute or the first recorded exception.type (for example QueryTimeout or 503). Exception messages and stack traces are never retained.
+   */
+  error_type?: string;
+};
+

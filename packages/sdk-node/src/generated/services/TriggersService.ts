@@ -1,0 +1,699 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+import type { CreateTriggerBatchRequest } from '../models/CreateTriggerBatchRequest.js';
+import type { CreateTriggerBatchResponse } from '../models/CreateTriggerBatchResponse.js';
+import type { CreateTriggerRequest } from '../models/CreateTriggerRequest.js';
+import type { ListTriggerDeadLetterResponse } from '../models/ListTriggerDeadLetterResponse.js';
+import type { ListTriggerRecordsResponse } from '../models/ListTriggerRecordsResponse.js';
+import type { Trigger } from '../models/Trigger.js';
+import type { TriggerDeadLetterReason } from '../models/TriggerDeadLetterReason.js';
+import type { TriggerKind } from '../models/TriggerKind.js';
+import type { TriggerMetricsResponse } from '../models/TriggerMetricsResponse.js';
+import type { TriggerRecordState } from '../models/TriggerRecordState.js';
+import type { TriggerWorkBinding } from '../models/TriggerWorkBinding.js';
+import type { UpdateTriggerRequest } from '../models/UpdateTriggerRequest.js';
+import type { CancelablePromise } from '../core/CancelablePromise.js';
+import { OpenAPI } from '../core/OpenAPI.js';
+import { request as __request } from '../core/request.js';
+export class TriggersService {
+  /**
+   * List triggers on the account.
+   * Returns every trigger owned by the calling account, optional
+   * ?app_id filter to scope to one app, ?kind to scope to one
+   * kind. Newest-first by created_at; result is unbounded but
+   * the typical account has well under 200. Cron schedules are
+   * not triggers: list them with GET /v1/crons.
+   *
+   * @returns Trigger The trigger list.
+   * @throws ApiError
+   */
+  public static listTriggers({
+    appId,
+    kind,
+  }: {
+    /**
+     * Optional app UUID to scope the listing to one app; the
+     * caller's account is still the authorization boundary.
+     *
+     */
+    appId?: string,
+    /**
+     * Optional trigger kind filter (kafka / nats / redis_streams
+     * / sqs_compat / queue / realtime). kind=cron answers 400
+     * validation_failed pointing at GET /v1/crons; any other
+     * unknown value produces an empty list.
+     *
+     */
+    kind?: TriggerKind,
+  }): CancelablePromise<Array<Trigger>> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/triggers',
+      query: {
+        'app_id': appId,
+        'kind': kind,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Create a trigger.
+   * Idempotent via Idempotency-Key header. Returns 402
+   * `plan_triggers_not_allowed` for Free plan. A 403 may be
+   * `trigger_kind_not_allowed`, `plan_trigger_quota`,
+   * `trigger_batch_window_too_large`, or
+   * `trigger_tls_skip_verify_not_allowed`.
+   *
+   * @returns Trigger The new trigger.
+   * @throws ApiError
+   */
+  public static createTrigger({
+    requestBody,
+    idempotencyKey,
+  }: {
+    requestBody: CreateTriggerRequest,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<Trigger> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/triggers',
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: trigger_invalid_kind | trigger_invalid_config — kind does not exist, or per-kind validation failed (missing brokers, empty topic, malformed URL, etc.).`,
+        401: `code: unauthorized`,
+        402: `code: plan_triggers_not_allowed — Free plan cannot create triggers; upgrade required.`,
+        403: `code: trigger_kind_not_allowed | plan_trigger_quota | trigger_batch_window_too_large | trigger_tls_skip_verify_not_allowed — source-kind or delivery configuration exceeds the account plan capabilities returned by GET /v1/account.`,
+        422: `code: trigger_immutable_field — kind and (for cron) trigger_id are immutable after create; changing them requires delete + recreate.`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `code: secret_store_unavailable — Kafka credentials could not be sealed or opened safely because host age key material is unavailable.`,
+      },
+    });
+  }
+  /**
+   * Bulk-create triggers from a gregale.yaml fragment.
+   * Fires a `triggers:` and `event_triggers:` fragment at the server,
+   * validates via the same path the CLI uses, and returns per-row ids
+   * and any per-row RFC 7807 codes. Event triggers for the target app
+   * are applied the way a source deploy applies them:
+   * existing subscriptions are kept, and a failure is one `errors`
+   * row after its changes are rolled back.
+   *
+   * @returns CreateTriggerBatchResponse Per-row outcome.
+   * @throws ApiError
+   */
+  public static batchCreateTriggers({
+    requestBody,
+    idempotencyKey,
+  }: {
+    requestBody: CreateTriggerBatchRequest,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<CreateTriggerBatchResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/triggers:batch_create',
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: trigger_invalid_kind | trigger_invalid_config — kind does not exist, or per-kind validation failed (missing brokers, empty topic, malformed URL, etc.).`,
+        401: `code: unauthorized`,
+        402: `code: plan_triggers_not_allowed — Free plan cannot create triggers; upgrade required.`,
+        403: `code: trigger_kind_not_allowed | plan_trigger_quota | trigger_batch_window_too_large | trigger_tls_skip_verify_not_allowed — source-kind or delivery configuration exceeds the account plan capabilities returned by GET /v1/account.`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Get one trigger.
+   * @returns Trigger The trigger.
+   * @throws ApiError
+   */
+  public static getTrigger({
+    id,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<Trigger> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/triggers/{id}',
+      path: {
+        'id': id,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Partial-update a trigger.
+   * Queue binding consumers are managed through the queue-binding API.
+   * Direct mutations of those private projections return 409.
+   *
+   * @returns Trigger The updated trigger.
+   * @throws ApiError
+   */
+  public static updateTrigger({
+    id,
+    requestBody,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    requestBody: UpdateTriggerRequest,
+  }): CancelablePromise<Trigger> {
+    return __request(OpenAPI, {
+      method: 'PATCH',
+      url: '/v1/triggers/{id}',
+      path: {
+        'id': id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: trigger_invalid_kind | trigger_invalid_config — kind does not exist, or per-kind validation failed (missing brokers, empty topic, malformed URL, etc.).`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        422: `code: trigger_immutable_field — kind and (for cron) trigger_id are immutable after create; changing them requires delete + recreate.`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `code: secret_store_unavailable — Kafka credentials could not be sealed or opened safely because host age key material is unavailable.`,
+      },
+    });
+  }
+  /**
+   * Delete a trigger.
+   * Delete an independent trigger. A private queue consumer must be removed
+   * through its queue binding; direct deletion of that projection returns 409.
+   *
+   * @returns void
+   * @throws ApiError
+   */
+  public static deleteTrigger({
+    id,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/triggers/{id}',
+      path: {
+        'id': id,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Get the broker trigger's application work-policy binding.
+   * @returns TriggerWorkBinding The configured broker work binding.
+   * @throws ApiError
+   */
+  public static getTriggerWorkBinding({
+    id,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<TriggerWorkBinding> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/triggers/{id}/work-binding',
+      path: {
+        'id': id,
+      },
+      errors: {
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Set the broker trigger's application work-policy binding.
+   * An initial binding requires a disabled external trigger with no
+   * existing record receipts. Resume the trigger after binding it.
+   * Updating an existing binding is allowed while the trigger is enabled;
+   * records already admitted keep their captured policy and key.
+   *
+   * @returns TriggerWorkBinding The updated broker work binding.
+   * @throws ApiError
+   */
+  public static putTriggerWorkBinding({
+    id,
+    requestBody,
+    idempotencyKey,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    requestBody: TriggerWorkBinding,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<TriggerWorkBinding> {
+    return __request(OpenAPI, {
+      method: 'PUT',
+      url: '/v1/triggers/{id}/work-binding',
+      path: {
+        'id': id,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        404: `code: not_found`,
+        409: `code: conflict`,
+        422: `code: trigger_invalid_kind | trigger_invalid_config — kind does not exist, or per-kind validation failed (missing brokers, empty topic, malformed URL, etc.).`,
+      },
+    });
+  }
+  /**
+   * Remove the broker trigger's application work-policy binding.
+   * @returns void
+   * @throws ApiError
+   */
+  public static deleteTriggerWorkBinding({
+    id,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/triggers/{id}/work-binding',
+      path: {
+        'id': id,
+      },
+      errors: {
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Disable a trigger without deleting it.
+   * Sets `enabled=false` and pg_notify's `trigger_changed`. Schedd
+   * stops the broker poller on the next tick; in-flight records
+   * drain normally.
+   * Queue binding consumers are managed through the queue-binding API;
+   * direct pause/resume of those private projections returns 409.
+   *
+   * @returns Trigger The paused trigger with enabled set to false.
+   * @throws ApiError
+   */
+  public static pauseTrigger({
+    id,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<Trigger> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/triggers/{id}/pause',
+      path: {
+        'id': id,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Re-enable a paused trigger.
+   * Sets `enabled=true` and pg_notify's `trigger_changed`.
+   * Schedd restarts the broker poller on the next tick.
+   * Queue binding consumers are managed through the queue-binding API;
+   * direct pause/resume of those private projections returns 409.
+   *
+   * @returns Trigger The resumed trigger with enabled set to true.
+   * @throws ApiError
+   */
+  public static resumeTrigger({
+    id,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<Trigger> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/triggers/{id}/resume',
+      path: {
+        'id': id,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * List records for one trigger.
+   * Newest-first by `received_at`. The dashboard uses this to
+   * build the "Recent fires" view; the CLI uses it for `--tail`.
+   *
+   * @returns ListTriggerRecordsResponse Records for this trigger.
+   * @throws ApiError
+   */
+  public static listTriggerRecords({
+    id,
+    state,
+    limit = 50,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    /**
+     * Optional state filter — pending / claimed / succeeded /
+     * retry / dead_letter. Lets the dashboard narrow to
+     * in-flight or DLQ rows.
+     *
+     */
+    state?: TriggerRecordState,
+    /**
+     * Page size; default 50, capped at 200.
+     *
+     */
+    limit?: number,
+  }): CancelablePromise<ListTriggerRecordsResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/triggers/{id}/records',
+      path: {
+        'id': id,
+      },
+      query: {
+        'state': state,
+        'limit': limit,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Force a record back into the dispatch queue.
+   * Resets state to `pending`, attempts to 0. Operator-only scope
+   * — the dashboard surfaces this as "Re-drive from DLQ".
+   *
+   * @returns void
+   * @throws ApiError
+   */
+  public static retryTriggerRecord({
+    id,
+    rid,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    /**
+     * Record id (UUID hex, no dashes) — used by retry/drop.
+     */
+    rid: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/triggers/{id}/records/{rid}/retry',
+      path: {
+        'id': id,
+        'rid': rid,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: trigger_dlq_retry_failed — record could not be re-driven (state was not retry or dead_letter).`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Drop a record without re-firing.
+   * Marks a dead-letter row `routed_to='drop'` (already the
+   * default; this is the explicit acknowledgement). Operator-only
+   * scope.
+   *
+   * @returns void
+   * @throws ApiError
+   */
+  public static dropTriggerRecord({
+    id,
+    rid,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    /**
+     * Record id (UUID hex, no dashes) — used by drop.
+     */
+    rid: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/triggers/{id}/records/{rid}/drop',
+      path: {
+        'id': id,
+        'rid': rid,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * List dead-letter rows for one trigger.
+   * @returns ListTriggerDeadLetterResponse Dead-letter rows for this trigger.
+   * @throws ApiError
+   */
+  public static listTriggerDeadLetter({
+    id,
+    reason,
+    limit = 50,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    /**
+     * Optional DLQ reason filter (poison_record / max_attempts /
+     * broker_error / rate_limited / payload_too_large /
+     * exclusive_operation_rejected).
+     *
+     */
+    reason?: TriggerDeadLetterReason,
+    /**
+     * DLQ page size; default 50, capped at 200.
+     *
+     */
+    limit?: number,
+  }): CancelablePromise<ListTriggerDeadLetterResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/triggers/{id}/dlq',
+      path: {
+        'id': id,
+      },
+      query: {
+        'reason': reason,
+        'limit': limit,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Per-state aggregate counts for one trigger.
+   * Counter roll-up by state. Not a Prometheus surface — that
+   * is /v1/metrics.
+   *
+   * @returns TriggerMetricsResponse Aggregated counts.
+   * @throws ApiError
+   */
+  public static getTriggerMetrics({
+    id,
+  }: {
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<TriggerMetricsResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/triggers/{id}/metrics',
+      path: {
+        'id': id,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Internal — the scheduler posts a batch envelope to the gateway.
+   * Internal-only route. Schedd invokes this once per closed
+   * batch. The gateway delivers records sequentially and returns one
+   * result per item. Each function response may include
+   * `{"batchItemFailures":[{"itemIdentifier":"..."}]}`.
+   * Durable queue records include an invocation ID and current claim
+   * attempt; source must be esm for these records.
+   *
+   * @returns any Batch accepted; per-record status derived from response.
+   * @throws ApiError
+   */
+  public static dispatchInvocationBatch({
+    requestBody,
+  }: {
+    requestBody: {
+      /**
+       * Synthetic batch identity, typically trigger- followed by the trigger UUID.
+       */
+      invocation_id: string;
+      trigger_id: string;
+      app_id: string;
+      /**
+       * Internal dispatch source; esm for trigger and durable queue batches.
+       */
+      source?: string;
+      records: Array<{
+        item_identifier: string;
+        /**
+         * Internal durable queue invocation ID; must equal item_identifier and have a current claimed lease.
+         */
+        invocation_id?: string;
+        /**
+         * Required with invocation_id; fences delivery to the current durable queue claim attempt.
+         */
+        invocation_attempt?: number;
+        payload_b64: string;
+        headers?: Record<string, string>;
+        metadata?: Record<string, any>;
+      }>;
+    },
+  }): CancelablePromise<{
+    results: Array<{
+      item_identifier: string;
+      status: 'succeeded' | 'retry' | 'dead_letter';
+      error?: string;
+      code?: string;
+    }>;
+  }> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/invocations:dispatch_batch',
+      body: requestBody,
+      mediaType: 'application/json',
+    });
+  }
+}

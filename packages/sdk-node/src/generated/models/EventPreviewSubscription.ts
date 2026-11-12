@@ -1,0 +1,34 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+/**
+ * A bounded sample of an enabled subscription or workflow considered by the event router.
+ */
+export type EventPreviewSubscription = {
+  /**
+   * Exact case-sensitive schema versions. Empty or omitted accepts all versions; a nonempty selection excludes unversioned events. Selection is captured at publication or backfill creation.
+   */
+  schema_versions?: Array<string>;
+  app_slug: string;
+  /**
+   * Present for workflow recipients.
+   */
+  workflow_name?: string;
+  /**
+   * Acceptance candidate deployment for workflow recipients.
+   */
+  deployment_id?: string;
+  subscription_id: string;
+  source: string;
+  type: string;
+  /**
+   * Normalized content filter declared by this subscription.
+   */
+  filter: Record<string, any>;
+  /**
+   * would_deliver, content_filter_mismatch, pattern_mismatch, tenant_mismatch, or an invalid_subscription explanation.
+   */
+  reason: string;
+};
+

@@ -1,0 +1,2682 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+import type { AsyncInvokeResponse } from '../models/AsyncInvokeResponse.js';
+import type { CommitBlockedEventsResponse } from '../models/CommitBlockedEventsResponse.js';
+import type { CommitEventRequest } from '../models/CommitEventRequest.js';
+import type { CommitPublicationHistoryResponse } from '../models/CommitPublicationHistoryResponse.js';
+import type { CommitReceiptResponse } from '../models/CommitReceiptResponse.js';
+import type { CommitSourceResponse } from '../models/CommitSourceResponse.js';
+import type { CreateCommitSourceRequest } from '../models/CreateCommitSourceRequest.js';
+import type { CreateQueueBindingRequest } from '../models/CreateQueueBindingRequest.js';
+import type { DeadLetterEvent } from '../models/DeadLetterEvent.js';
+import type { DeadLetterEventsResponse } from '../models/DeadLetterEventsResponse.js';
+import type { DeadLetterPurgeResponse } from '../models/DeadLetterPurgeResponse.js';
+import type { DeadLetterReplayAllResponse } from '../models/DeadLetterReplayAllResponse.js';
+import type { OrgQueueUsageResponse } from '../models/OrgQueueUsageResponse.js';
+import type { Problem } from '../models/Problem.js';
+import type { QueueBindingResponse } from '../models/QueueBindingResponse.js';
+import type { QueueBindingStatusResponse } from '../models/QueueBindingStatusResponse.js';
+import type { QueueDeadLetterResponse } from '../models/QueueDeadLetterResponse.js';
+import type { QueueLeaseReceiptsRequest } from '../models/QueueLeaseReceiptsRequest.js';
+import type { QueueLeaseReceiptsResponse } from '../models/QueueLeaseReceiptsResponse.js';
+import type { QueueLeaseRequest } from '../models/QueueLeaseRequest.js';
+import type { QueueLeaseResponse } from '../models/QueueLeaseResponse.js';
+import type { QueuePeekResponse } from '../models/QueuePeekResponse.js';
+import type { QueueReceiveResponse } from '../models/QueueReceiveResponse.js';
+import type { QueueSendBatchRequest } from '../models/QueueSendBatchRequest.js';
+import type { QueueSendBatchResponse } from '../models/QueueSendBatchResponse.js';
+import type { QueueSendRequest } from '../models/QueueSendRequest.js';
+import type { QueueSendResponse } from '../models/QueueSendResponse.js';
+import type { QueueStateResponse } from '../models/QueueStateResponse.js';
+import type { QueueWorkloadProfileRequest } from '../models/QueueWorkloadProfileRequest.js';
+import type { QueueWorkloadProfileResponse } from '../models/QueueWorkloadProfileResponse.js';
+import type { SendAppMessageRequest } from '../models/SendAppMessageRequest.js';
+import type { SendAppMessageResponse } from '../models/SendAppMessageResponse.js';
+import type { UpdateQueueBindingRequest } from '../models/UpdateQueueBindingRequest.js';
+import type { CancelablePromise } from '../core/CancelablePromise.js';
+import { OpenAPI } from '../core/OpenAPI.js';
+import { request as __request } from '../core/request.js';
+export class QueuesService {
+  /**
+   * Replay a failed event from the dashboard.
+   * Resets the source event to pending and redirects to the Failed Events inbox.
+   * @returns void
+   * @throws ApiError
+   */
+  public static dashboardReplayFailedEvent({
+    slug,
+    id,
+    formData,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Unified failed-event identifier to replay.
+     */
+    id: string,
+    formData: {
+      csrf_token: string;
+    },
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/dashboard/failed-events/{slug}/{id}/replay',
+      path: {
+        'slug': slug,
+        'id': id,
+      },
+      formData: formData,
+      mediaType: 'application/x-www-form-urlencoded',
+      errors: {
+        303: `Redirect to the account-wide Failed Events inbox after replay.`,
+        400: `Invalid dashboard CSRF token for account-event replay.`,
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Discard a failed event from the dashboard.
+   * Removes the ledger projection and redirects to the Failed Events inbox.
+   * @returns void
+   * @throws ApiError
+   */
+  public static dashboardDiscardFailedEvent({
+    slug,
+    id,
+    formData,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Unified failed-event identifier to discard.
+     */
+    id: string,
+    formData: {
+      csrf_token: string;
+    },
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/dashboard/failed-events/{slug}/{id}/discard',
+      path: {
+        'slug': slug,
+        'id': id,
+      },
+      formData: formData,
+      mediaType: 'application/x-www-form-urlencoded',
+      errors: {
+        303: `Redirect to the account-wide Failed Events inbox after discard.`,
+        400: `Invalid dashboard CSRF token for account-event discard.`,
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Replay an account-owned failed event from the dashboard.
+   * Resets an account-scoped source event to pending and redirects to the Failed Events inbox.
+   * @returns void
+   * @throws ApiError
+   */
+  public static dashboardReplayAccountFailedEvent({
+    id,
+    formData,
+  }: {
+    /**
+     * Account-wide unified failed-event identifier to replay.
+     */
+    id: string,
+    formData: {
+      csrf_token: string;
+    },
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/dashboard/failed-events/account/{id}/replay',
+      path: {
+        'id': id,
+      },
+      formData: formData,
+      mediaType: 'application/x-www-form-urlencoded',
+      errors: {
+        303: `Redirect to the Failed Events inbox after replay.`,
+        400: `Invalid dashboard CSRF token for replay.`,
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Discard an account-owned failed event from the dashboard.
+   * Removes the account-wide ledger projection and redirects to the Failed Events inbox.
+   * @returns void
+   * @throws ApiError
+   */
+  public static dashboardDiscardAccountFailedEvent({
+    id,
+    formData,
+  }: {
+    /**
+     * Account-wide unified failed-event identifier to discard.
+     */
+    id: string,
+    formData: {
+      csrf_token: string;
+    },
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/dashboard/failed-events/account/{id}/discard',
+      path: {
+        'id': id,
+      },
+      formData: formData,
+      mediaType: 'application/x-www-form-urlencoded',
+      errors: {
+        303: `Redirect to the Failed Events inbox after discard.`,
+        400: `Invalid dashboard CSRF token for discard.`,
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Enqueue a row on the per-app FIFO queue.
+   * Cap-checked against the plan's MaxQueueDepth (Hobby 5, Pro 25,
+   * Scale 100). The drain re-checks at dispatch tick. API keys require
+   * `queues:send`, `deploy:write`, or `admin`.
+   *
+   * @returns QueueSendResponse The enqueued row.
+   * @throws ApiError
+   */
+  public static queueSend({
+    slug,
+    requestBody,
+    idempotencyKey,
+    xGregaleRevision,
+    xGregaleRelease,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    requestBody: QueueSendRequest,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+    /**
+     * Exact deployment pin. Mutually exclusive with X-Gregale-Release; checked again at delivery.
+     */
+    xGregaleRevision?: string,
+    /**
+     * Immutable project release set. Defaults to the active set for project apps and is checked again at delivery.
+     */
+    xGregaleRelease?: string,
+  }): CancelablePromise<QueueSendResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/queues/send',
+      path: {
+        'slug': slug,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+        'X-Gregale-Revision': xGregaleRevision,
+        'X-Gregale-Release': xGregaleRelease,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        403: `code: plan_queue_depth — per-app queue at the plan's MaxQueueDepth.`,
+        413: `code: source_too_large — payload exceeds the plan's MaxSourceBytesPerInvocation.`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Send up to 100 messages to one queue as one request.
+   * Sends the messages in order with the same admission as a single send:
+   * queue depth, backlog bytes and message size are checked for each one.
+   * The first refused message ends the batch; the messages after it are
+   * not attempted. Resend from the first message that was not accepted.
+   * The batch counts as one request against the account's API budget.
+   * API keys require `queues:send`, `deploy:write`, or `admin`.
+   *
+   * @returns QueueSendBatchResponse The outcome of every message, in input order.
+   * @throws ApiError
+   */
+  public static queueSendBatch({
+    slug,
+    requestBody,
+    idempotencyKey,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    requestBody: QueueSendBatchRequest,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<QueueSendBatchResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/queues/send-batch',
+      path: {
+        'slug': slug,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        403: `code: plan_queue_depth — per-app queue at the plan's MaxQueueDepth.`,
+        413: `code: source_too_large — payload exceeds the plan's MaxSourceBytesPerInvocation.`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Bind an internal PostgreSQL outbox source to Operations or event publication.
+   * @returns CommitSourceResponse Commit source created with its immutable application, destination and contract binding.
+   * @throws ApiError
+   */
+  public static createCommitSource({
+    slug,
+    requestBody,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    requestBody: CreateCommitSourceRequest,
+  }): CancelablePromise<CommitSourceResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/commit-sources',
+      path: {
+        'slug': slug,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Inspect source health and its last observed pending/blocked backlog.
+   * @returns CommitSourceResponse Source and last relay observation; no credential material.
+   * @throws ApiError
+   */
+  public static getCommitSource({
+    source,
+  }: {
+    /**
+     * Commit source to inspect within the authenticated account.
+     */
+    source: string,
+  }): CancelablePromise<CommitSourceResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/commit-sources/{source}',
+      path: {
+        'source': source,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Pause or resume new source acceptance; existing receipts remain recoverable.
+   * @returns CommitSourceResponse Source acceptance state updated; previously accepted receipts remain readable.
+   * @throws ApiError
+   */
+  public static setCommitSourceEnabled({
+    source,
+    requestBody,
+  }: {
+    /**
+     * Commit source whose acceptance state is being changed.
+     */
+    source: string,
+    requestBody: {
+      enabled: boolean;
+    },
+  }): CancelablePromise<CommitSourceResponse> {
+    return __request(OpenAPI, {
+      method: 'PATCH',
+      url: '/v1/commit-sources/{source}',
+      path: {
+        'source': source,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Seal a verified-TLS database connection; credentials are never returned.
+   * @returns void
+   * @throws ApiError
+   */
+  public static putCommitSourceConnection({
+    source,
+    requestBody,
+  }: {
+    /**
+     * Commit source receiving the sealed database connection.
+     */
+    source: string,
+    requestBody: {
+      connection_url: string;
+    },
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'PUT',
+      url: '/v1/commit-sources/{source}/connection',
+      path: {
+        'source': source,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Durably accept committed work; source/event identity has no expiry.
+   * @returns CommitReceiptResponse Event durably accepted with its original or newly created work receipt.
+   * @throws ApiError
+   */
+  public static acceptCommitEvent({
+    source,
+    requestBody,
+  }: {
+    /**
+     * Commit source defining the immutable event delivery destination.
+     */
+    source: string,
+    requestBody: CommitEventRequest,
+  }): CancelablePromise<CommitReceiptResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/commit-sources/{source}/events',
+      path: {
+        'source': source,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * List retained publication acceptance receipts for an event source.
+   * Newest-first metadata only. Acceptance does not imply subscriber completion. Pages are live reads; concurrent admissions may require restarting from the first page. Delivery evidence may expire independently.
+   * @returns CommitPublicationHistoryResponse Accepted publications and an optional continuation cursor.
+   * @throws ApiError
+   */
+  public static listCommitPublications({
+    source,
+    before,
+    limit = 50,
+  }: {
+    /**
+     * Event-destination Commit source owned by the authenticated account.
+     */
+    source: string,
+    /**
+     * Opaque source-scoped next_before cursor from the previous page.
+     */
+    before?: string,
+    /**
+     * Maximum number of retained receipts per page.
+     */
+    limit?: number,
+  }): CancelablePromise<CommitPublicationHistoryResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/commit-sources/{source}/publications',
+      path: {
+        'source': source,
+      },
+      query: {
+        'before': before,
+        'limit': limit,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Read the latest bounded blocked-event snapshot without payloads.
+   * @returns CommitBlockedEventsResponse Up to 32 observed blocked events; source info reports the full count.
+   * @throws ApiError
+   */
+  public static listCommitBlockedEvents({
+    source,
+  }: {
+    /**
+     * Commit source whose blocked-event observation is being read.
+     */
+    source: string,
+  }): CancelablePromise<CommitBlockedEventsResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/commit-sources/{source}/blocked-events',
+      path: {
+        'source': source,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Request durable replay after correcting an unaccepted source event.
+   * @returns any Replay request persisted; this is not downstream acceptance or completion.
+   * @throws ApiError
+   */
+  public static replayCommitBlockedEvent({
+    source,
+    event,
+    idempotencyKey,
+  }: {
+    /**
+     * Commit source containing the corrected blocked event.
+     */
+    source: string,
+    /**
+     * Customer outbox event UUID to request for replay.
+     */
+    event: string,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<any> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/commit-sources/{source}/events/{event}/replay',
+      path: {
+        'source': source,
+        'event': event,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Recover acceptance independently of execution completion.
+   * @returns CommitReceiptResponse Retained acceptance receipt for the requested source and event.
+   * @throws ApiError
+   */
+  public static getCommitReceipt({
+    source,
+    event,
+  }: {
+    /**
+     * Commit source that owns the retained acceptance receipt.
+     */
+    source: string,
+    /**
+     * Customer outbox event UUID whose receipt is being recovered.
+     */
+    event: string,
+  }): CancelablePromise<CommitReceiptResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/commit-sources/{source}/events/{event}',
+      path: {
+        'source': source,
+        'event': event,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Reliably send work to another Gregale application.
+   * Wraps `data` in a CloudEvents 1.0 envelope and durably enqueues it on
+   * the target application's existing invocation queue. Delivery is
+   * at-least-once and uses the queue's normal retry, tracing, dead-letter,
+   * replay, wake, and capacity behavior. This is a straightforward
+   * application inbox, not a general-purpose streaming log. API keys
+   * require `events:publish`, `deploy:write`, or `admin`.
+   *
+   * @returns SendAppMessageResponse The message was durably queued.
+   * @throws ApiError
+   */
+  public static sendAppMessage({
+    slug,
+    requestBody,
+    idempotencyKey,
+    xGregaleRevision,
+    xGregaleRelease,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    requestBody: SendAppMessageRequest,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+    /**
+     * Exact deployment pin. Mutually exclusive with X-Gregale-Release; checked again at delivery.
+     */
+    xGregaleRevision?: string,
+    /**
+     * Immutable project release set. Defaults to the active set for project apps and is checked again at delivery.
+     */
+    xGregaleRelease?: string,
+  }): CancelablePromise<SendAppMessageResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/inbox',
+      path: {
+        'slug': slug,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+        'X-Gregale-Revision': xGregaleRevision,
+        'X-Gregale-Release': xGregaleRelease,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        402: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        403: `code: plan_queue_depth — per-app queue at the plan's MaxQueueDepth.`,
+        404: `code: not_found`,
+        413: `code: source_too_large — payload exceeds the plan's MaxSourceBytesPerInvocation.`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Configure the simple queue workload profile.
+   * Idempotently creates or updates the app's default push queue
+   * binding, consumer projection, and queue-depth scaling policy.
+   * Zero-valued request fields use platform defaults; advanced
+   * resources remain available through the individual APIs.
+   *
+   * @returns QueueWorkloadProfileResponse Existing profile converged.
+   * @throws ApiError
+   */
+  public static configureQueueWorkload({
+    slug,
+    requestBody,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    requestBody?: QueueWorkloadProfileRequest,
+  }): CancelablePromise<QueueWorkloadProfileResponse> {
+    return __request(OpenAPI, {
+      method: 'PUT',
+      url: '/v1/apps/{slug}/queue-workload',
+      path: {
+        'slug': slug,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        402: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * List first-class queue bindings for an app.
+   * Returns the durable mappings between logical queues and worker/job
+   * workloads. Bindings are the configuration source for push consumers
+   * and queue-depth autoscaling; queue messages remain under /queues*.
+   * Active bindings are returned by default. Set include_retired=true to
+   * retrieve retained identities and retirement timestamps for reviewed recovery.
+   *
+   * @returns QueueBindingResponse Queue bindings.
+   * @throws ApiError
+   */
+  public static listQueueBindings({
+    slug,
+    includeRetired = false,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Include retained retired bindings belonging to this app.
+     */
+    includeRetired?: boolean,
+  }): CancelablePromise<Array<QueueBindingResponse>> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/apps/{slug}/queue-bindings',
+      path: {
+        'slug': slug,
+      },
+      query: {
+        'include_retired': includeRetired,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Create a first-class queue binding.
+   * @returns QueueBindingResponse Created queue binding.
+   * @throws ApiError
+   */
+  public static createQueueBinding({
+    slug,
+    requestBody,
+    idempotencyKey,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    requestBody: CreateQueueBindingRequest,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<QueueBindingResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/queue-bindings',
+      path: {
+        'slug': slug,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Get one queue binding.
+   * @returns QueueBindingResponse Queue binding.
+   * @throws ApiError
+   */
+  public static getQueueBinding({
+    slug,
+    id,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<QueueBindingResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/apps/{slug}/queue-bindings/{id}',
+      path: {
+        'slug': slug,
+        'id': id,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Update one queue binding.
+   * @returns QueueBindingResponse Updated queue binding.
+   * @throws ApiError
+   */
+  public static updateQueueBinding({
+    slug,
+    id,
+    requestBody,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    requestBody: UpdateQueueBindingRequest,
+  }): CancelablePromise<QueueBindingResponse> {
+    return __request(OpenAPI, {
+      method: 'PATCH',
+      url: '/v1/apps/{slug}/queue-bindings/{id}',
+      path: {
+        'slug': slug,
+        'id': id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Delete one queue binding.
+   * @returns void
+   * @throws ApiError
+   */
+  public static deleteQueueBinding({
+    slug,
+    id,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/apps/{slug}/queue-bindings/{id}',
+      path: {
+        'slug': slug,
+        'id': id,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Read queue binding consumer state and queue counters.
+   * Returns the durable push-consumer projection and binding-scoped
+   * queue counters. `consumer_state` is control-plane state
+   * (`active`, `paused`, `not_configured`, or `external`), while
+   * `consumer_liveness` and the poll timestamps expose the scheduler's
+   * last-known health. A push snapshot is stale after 30 seconds without
+   * a completed poll; pull bindings report `external` liveness.
+   *
+   * @returns QueueBindingStatusResponse Queue binding status.
+   * @throws ApiError
+   */
+  public static getQueueBindingStatus({
+    slug,
+    id,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<QueueBindingStatusResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/apps/{slug}/queue-bindings/{id}/status',
+      path: {
+        'slug': slug,
+        'id': id,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Long-poll for the next dispatched row.
+   * Returns 200 with the dequeued row, or 204 (no body) if the
+   * server-side 30s budget elapses with no event. The customer
+   * retries on 204.
+   *
+   * @returns QueueReceiveResponse A dispatched row.
+   * @throws ApiError
+   */
+  public static queueReceive({
+    slug,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+  }): CancelablePromise<QueueReceiveResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/queues/receive',
+      path: {
+        'slug': slug,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        403: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Ack a queue row (idempotent).
+   * @returns void
+   * @throws ApiError
+   */
+  public static queueAck({
+    slug,
+    id,
+    idempotencyKey,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/queues/{id}/ack',
+      path: {
+        'slug': slug,
+        'id': id,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Lease ready messages from a pull-bound queue.
+   * Leases up to `max_messages` ready messages from a queue with an
+   * enabled pull binding on this app. Each message stays hidden for the
+   * visibility timeout and is redelivered with a new attempt if it is not
+   * acked, nacked or extended in time. Unexpired leases never exceed the
+   * binding's `max_concurrency`. An empty list means nothing is ready;
+   * poll again with back-off. Authenticate with an API key carrying
+   * `queues:consume`, `deploy:write` or `admin`, or with a workload
+   * identity token for audience `gregale:queues` from a live instance of
+   * this app.
+   *
+   * @returns QueueLeaseResponse Leased messages, possibly none.
+   * @throws ApiError
+   */
+  public static leaseQueueMessages({
+    slug,
+    queue,
+    requestBody,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Queue name of an enabled pull binding on this app.
+     */
+    queue: string,
+    requestBody?: QueueLeaseRequest,
+  }): CancelablePromise<QueueLeaseResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/queues/{queue}/leases',
+      path: {
+        'slug': slug,
+        'queue': queue,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        403: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Complete leased messages.
+   * @returns QueueLeaseReceiptsResponse Receipts that completed their messages, and receipts that no longer own one.
+   * @throws ApiError
+   */
+  public static ackQueueLeases({
+    slug,
+    queue,
+    requestBody,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Queue name of an enabled pull binding on this app.
+     */
+    queue: string,
+    requestBody: QueueLeaseReceiptsRequest,
+  }): CancelablePromise<QueueLeaseReceiptsResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/queues/{queue}/leases:ack',
+      path: {
+        'slug': slug,
+        'queue': queue,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        403: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Return leased messages for a retry.
+   * Applies the message's retry policy and the plan's attempt budget:
+   * the message returns to the queue after the back-off (or after
+   * `delay_seconds` if later), or moves to the dead-letter queue once the
+   * budget is spent. `error` is recorded as the attempt's last error.
+   *
+   * @returns QueueLeaseReceiptsResponse Receipts whose messages went back for a retry or to the dead-letter queue, and receipts that no longer own one.
+   * @throws ApiError
+   */
+  public static nackQueueLeases({
+    slug,
+    queue,
+    requestBody,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Queue name of an enabled pull binding on this app.
+     */
+    queue: string,
+    requestBody: QueueLeaseReceiptsRequest,
+  }): CancelablePromise<QueueLeaseReceiptsResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/queues/{queue}/leases:nack',
+      path: {
+        'slug': slug,
+        'queue': queue,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        403: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Extend the visibility timeout of leased messages.
+   * @returns QueueLeaseReceiptsResponse Receipts whose visibility deadline moved, and receipts that no longer own their message.
+   * @throws ApiError
+   */
+  public static extendQueueLeases({
+    slug,
+    queue,
+    requestBody,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Queue name of an enabled pull binding on this app.
+     */
+    queue: string,
+    requestBody: QueueLeaseReceiptsRequest,
+  }): CancelablePromise<QueueLeaseReceiptsResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/queues/{queue}/leases:extend',
+      path: {
+        'slug': slug,
+        'queue': queue,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        403: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Read queue depth, in-flight count, and oldest pending age.
+   * Read-only depth / in-flight / oldest-pending stats. NO lease is
+   * acquired and no row is mutated — the response can be polled at
+   * any cadence without affecting drain behaviour. Free plans can
+   * call this for diagnostics even though they cannot send.
+   *
+   * @returns QueueStateResponse Queue stats for the app.
+   * @throws ApiError
+   */
+  public static queueState({
+    slug,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+  }): CancelablePromise<QueueStateResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/apps/{slug}/queues/state',
+      path: {
+        'slug': slug,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * List pending queue rows without acquiring a lease.
+   * Read-only peek at pending rows, oldest first. Repeated calls
+   * return the same rows in the same order — the underlying SQL has
+   * no FOR UPDATE / FOR SHARE / advisory lock, so attempts is
+   * never incremented and no row state changes. Cursor pagination
+   * matches the existing `?before=<id>` convention. NOT equivalent
+   * to `queues/receive` — peek never leases.
+   *
+   * @returns QueuePeekResponse A page of pending rows.
+   * @throws ApiError
+   */
+  public static queuePeek({
+    slug,
+    limit = 20,
+    before,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Maximum number of rows to return; capped at 200.
+     */
+    limit?: number,
+    /**
+     * Cursor — the last id from the previous page (omit for the first page).
+     */
+    before?: string,
+  }): CancelablePromise<QueuePeekResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/apps/{slug}/queues/peek',
+      path: {
+        'slug': slug,
+      },
+      query: {
+        'limit': limit,
+        'before': before,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * List queue rows that exhausted the plan's retry budget.
+   * Read-only list of rows in `state='dead_letter'`, newest first.
+   * The drain transitions a row here once it has failed
+   * `MaxQueueAttempts` times for the app's plan (Hobby 3, Pro 10,
+   * Scale 25). NO lease is acquired and no row is mutated. Replaying
+   * a dead-letter row is out of scope for this endpoint — see
+   * `POST /v1/apps/{slug}/queues/dead_letter/{id}/replay`.
+   *
+   * @returns QueueDeadLetterResponse A page of dead-letter rows.
+   * @throws ApiError
+   */
+  public static queueDeadLetter({
+    slug,
+    limit = 20,
+    before,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Maximum number of rows to return; capped at 200.
+     */
+    limit?: number,
+    /**
+     * Cursor — the last id from the previous page (omit for the first page).
+     */
+    before?: string,
+  }): CancelablePromise<QueueDeadLetterResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/apps/{slug}/queues/dead_letter',
+      path: {
+        'slug': slug,
+      },
+      query: {
+        'limit': limit,
+        'before': before,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Reset a dead-letter queue row back to pending.
+   * Resets the row's `state` to `pending` with
+   * `attempts=0`, `last_error=null`, `due_at=now`,
+   * `last_replayed_at=now`. Distinct from
+   * `POST /v1/invocations/{id}/replay`, which enqueues a NEW row
+   * tagged Source=InvocationReplay. This endpoint mutates the
+   * existing row in place so the dashboard's replay history view
+   * tracks the chain on a single row id.
+   *
+   * Idempotent: a second POST after the first has succeeded
+   * finds the row in 'pending' and returns 404. The
+   * Idempotency-Key middleware (issued automatically by the SDK)
+   * covers double-POST across network retries.
+   *
+   * @returns AsyncInvokeResponse Replay accepted; row is back to pending.
+   * @throws ApiError
+   */
+  public static queueDeadLetterReplay({
+    slug,
+    id,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * The invocation id of the dead-letter row to replay.
+     */
+    id: string,
+  }): CancelablePromise<AsyncInvokeResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/queues/dead_letter/{id}/replay',
+      path: {
+        'slug': slug,
+        'id': id,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * List dead-letter events for an app.
+   * Returns queue invocation, broker trigger, and outbound webhook
+   * delivery failures in one durable, newest-first ledger. The source row
+   * is not leased or mutated.
+   *
+   * @returns DeadLetterEventsResponse A page of unified dead-letter events.
+   * @throws ApiError
+   */
+  public static listDeadLetterEvents({
+    slug,
+    limit = 20,
+    before,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Maximum number of rows to return; capped at 200.
+     */
+    limit?: number,
+    /**
+     * Cursor — the last id from the previous page (omit for the first page).
+     */
+    before?: string,
+  }): CancelablePromise<DeadLetterEventsResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/apps/{slug}/dlq',
+      path: {
+        'slug': slug,
+      },
+      query: {
+        'limit': limit,
+        'before': before,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Purge dead-letter events from the app ledger.
+   * Removes up to `limit` ledger projections; source records remain dead-lettered.
+   * @returns DeadLetterPurgeResponse Number of ledger events purged.
+   * @throws ApiError
+   */
+  public static purgeDeadLetterEvents({
+    slug,
+    limit = 20,
+    idempotencyKey,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Maximum number of rows to return; capped at 200.
+     */
+    limit?: number,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<DeadLetterPurgeResponse> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/apps/{slug}/dlq',
+      path: {
+        'slug': slug,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      query: {
+        'limit': limit,
+      },
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Replay pending dead-letter events for an app.
+   * Atomically resets up to `limit` pending queue invocation, broker
+   * trigger, and outbound webhook delivery records to pending and stamps
+   * each ledger row with replayed_at. Concurrent operators claim disjoint
+   * rows.
+   *
+   * @returns DeadLetterReplayAllResponse Number of events accepted for replay.
+   * @throws ApiError
+   */
+  public static replayAllDeadLetterEvents({
+    slug,
+    limit = 20,
+    idempotencyKey,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Maximum number of rows to return; capped at 200.
+     */
+    limit?: number,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<DeadLetterReplayAllResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/dlq:replay_all',
+      path: {
+        'slug': slug,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      query: {
+        'limit': limit,
+      },
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Get one dead-letter event for an app.
+   * @returns DeadLetterEvent The dead-letter event.
+   * @throws ApiError
+   */
+  public static getDeadLetterEvent({
+    slug,
+    id,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<DeadLetterEvent> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/apps/{slug}/dlq/{id}',
+      path: {
+        'slug': slug,
+        'id': id,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Purge one dead-letter event from the app ledger.
+   * Removes only the ledger projection; the source remains dead-lettered.
+   * @returns void
+   * @throws ApiError
+   */
+  public static deleteDeadLetterEvent({
+    slug,
+    id,
+    idempotencyKey,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/apps/{slug}/dlq/{id}',
+      path: {
+        'slug': slug,
+        'id': id,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Replay one dead-letter event atomically.
+   * Resets the source invocation, trigger record, or outbound webhook
+   * delivery to pending, clears its retry error, and records replayed_at
+   * on the unified ledger. An event_route entry (a routing failure whose
+   * receipt was pruned) has nothing to redrive and answers 409
+   * dead_letter_not_replayable.
+   *
+   * @returns DeadLetterEvent Replay accepted.
+   * @throws ApiError
+   */
+  public static replayDeadLetterEvent({
+    slug,
+    id,
+    idempotencyKey,
+  }: {
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<DeadLetterEvent> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/apps/{slug}/dlq/{id}/replay',
+      path: {
+        'slug': slug,
+        'id': id,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Enqueue a row on the per-app FIFO queue
+   * Organization queues: Enqueue a row on the per-app FIFO queue. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure. Cap-checked against the plan's MaxQueueDepth (Hobby 5, Pro 25,
+   * Scale 100). The drain re-checks at dispatch tick. API keys require
+   * `queues:send`, `deploy:write`, or `admin`.
+   * @returns QueueSendResponse Organization queues: Enqueue a row on the per-app FIFO queue. The enqueued row.
+   * @throws ApiError
+   */
+  public static sendOrgQueueMessage({
+    organization,
+    slug,
+    requestBody,
+    idempotencyKey,
+    xGregaleRevision,
+    xGregaleRelease,
+  }: {
+    /**
+     * Organization queues: Enqueue a row on the per-app FIFO queue. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    requestBody: QueueSendRequest,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+    /**
+     * Exact deployment pin. Mutually exclusive with X-Gregale-Release; checked again at delivery.
+     */
+    xGregaleRevision?: string,
+    /**
+     * Immutable project release set. Defaults to the active set for project apps and is checked again at delivery.
+     */
+    xGregaleRelease?: string,
+  }): CancelablePromise<QueueSendResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/send',
+      path: {
+        'organization': organization,
+        'slug': slug,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+        'X-Gregale-Revision': xGregaleRevision,
+        'X-Gregale-Release': xGregaleRelease,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        403: `code: plan_queue_depth — per-app queue at the plan's MaxQueueDepth.`,
+        413: `code: source_too_large — payload exceeds the plan's MaxSourceBytesPerInvocation.`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Send up to 100 messages to one queue as one request
+   * Organization queues: Send up to 100 messages to one queue as one request. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. The first refused message ends the batch; resend from the first message that was not accepted. API keys require `queues:send`, `deploy:write`, or `admin`.
+   * @returns QueueSendBatchResponse Organization queues: The outcome of every message, in input order.
+   * @throws ApiError
+   */
+  public static sendOrgQueueMessageBatch({
+    organization,
+    slug,
+    requestBody,
+    idempotencyKey,
+  }: {
+    /**
+     * Organization queues: Send up to 100 messages to one queue as one request. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    requestBody: QueueSendBatchRequest,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<QueueSendBatchResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/send-batch',
+      path: {
+        'organization': organization,
+        'slug': slug,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        403: `code: plan_queue_depth — per-app queue at the plan's MaxQueueDepth.`,
+        413: `code: source_too_large — payload exceeds the plan's MaxSourceBytesPerInvocation.`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: List first-class queue bindings for an app
+   * Organization queues: List first-class queue bindings for an app. Owners, admins, developers and viewers can read metadata. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure. Returns the durable mappings between logical queues and worker/job
+   * workloads. Bindings are the configuration source for push consumers
+   * and queue-depth autoscaling; queue messages remain under /queues*.
+   * Active bindings are returned by default. Set include_retired=true to
+   * retrieve retained identities and retirement timestamps for reviewed recovery.
+   * @returns QueueBindingResponse Organization queues: List first-class queue bindings for an app. Queue bindings.
+   * @throws ApiError
+   */
+  public static listOrgQueueBindings({
+    organization,
+    slug,
+    includeRetired = false,
+  }: {
+    /**
+     * Organization queues: List first-class queue bindings for an app. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Organization queues: List first-class queue bindings for an app. Include retained retired bindings belonging to this app.
+     */
+    includeRetired?: boolean,
+  }): CancelablePromise<Array<QueueBindingResponse>> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/orgs/{organization}/apps/{slug}/queue-bindings',
+      path: {
+        'organization': organization,
+        'slug': slug,
+      },
+      query: {
+        'include_retired': includeRetired,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Create a first-class queue binding
+   * Organization queues: Create a first-class queue binding. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure.
+   * @returns QueueBindingResponse Organization queues: Create a first-class queue binding. Created queue binding.
+   * @throws ApiError
+   */
+  public static createOrgQueueBinding({
+    organization,
+    slug,
+    requestBody,
+    idempotencyKey,
+  }: {
+    /**
+     * Organization queues: List first-class queue bindings for an app. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    requestBody: CreateQueueBindingRequest,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<QueueBindingResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/orgs/{organization}/apps/{slug}/queue-bindings',
+      path: {
+        'organization': organization,
+        'slug': slug,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Get one queue binding
+   * Organization queues: Get one queue binding. Owners, admins, developers and viewers can read metadata. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure.
+   * @returns QueueBindingResponse Organization queues: Get one queue binding. Queue binding.
+   * @throws ApiError
+   */
+  public static getOrgQueueBinding({
+    organization,
+    slug,
+    id,
+  }: {
+    /**
+     * Organization queues: Get one queue binding. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<QueueBindingResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/orgs/{organization}/apps/{slug}/queue-bindings/{id}',
+      path: {
+        'organization': organization,
+        'slug': slug,
+        'id': id,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Update one queue binding
+   * Organization queues: Update one queue binding. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure.
+   * @returns QueueBindingResponse Organization queues: Update one queue binding. Updated queue binding.
+   * @throws ApiError
+   */
+  public static updateOrgQueueBinding({
+    organization,
+    slug,
+    id,
+    requestBody,
+  }: {
+    /**
+     * Organization queues: Get one queue binding. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    requestBody: UpdateQueueBindingRequest,
+  }): CancelablePromise<QueueBindingResponse> {
+    return __request(OpenAPI, {
+      method: 'PATCH',
+      url: '/v1/orgs/{organization}/apps/{slug}/queue-bindings/{id}',
+      path: {
+        'organization': organization,
+        'slug': slug,
+        'id': id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Delete one queue binding
+   * Organization queues: Delete one queue binding. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure.
+   * @returns void
+   * @throws ApiError
+   */
+  public static deleteOrgQueueBinding({
+    organization,
+    slug,
+    id,
+  }: {
+    /**
+     * Organization queues: Get one queue binding. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/orgs/{organization}/apps/{slug}/queue-bindings/{id}',
+      path: {
+        'organization': organization,
+        'slug': slug,
+        'id': id,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Read queue binding consumer state and queue counters
+   * Organization queues: Read queue binding consumer state and queue counters. Owners, admins, developers and viewers can read metadata. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure. Returns the durable push-consumer projection and binding-scoped
+   * queue counters. `consumer_state` is control-plane state
+   * (`active`, `paused`, `not_configured`, or `external`), while
+   * `consumer_liveness` and the poll timestamps expose the scheduler's
+   * last-known health. A push snapshot is stale after 30 seconds without
+   * a completed poll; pull bindings report `external` liveness.
+   * @returns QueueBindingStatusResponse Organization queues: Read queue binding consumer state and queue counters. Queue binding status.
+   * @throws ApiError
+   */
+  public static getOrgQueueBindingStatus({
+    organization,
+    slug,
+    id,
+  }: {
+    /**
+     * Organization queues: Read queue binding consumer state and queue counters. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+  }): CancelablePromise<QueueBindingStatusResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/orgs/{organization}/apps/{slug}/queue-bindings/{id}/status',
+      path: {
+        'organization': organization,
+        'slug': slug,
+        'id': id,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Long-poll for the next dispatched row
+   * Organization queues: Long-poll for the next dispatched row. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure. Returns 200 with the dequeued row, or 204 (no body) if the
+   * server-side 30s budget elapses with no event. The customer
+   * retries on 204.
+   * @returns QueueReceiveResponse Organization queues: Long-poll for the next dispatched row. A dispatched row.
+   * @throws ApiError
+   */
+  public static receiveOrgQueueResult({
+    organization,
+    slug,
+  }: {
+    /**
+     * Organization queues: Long-poll for the next dispatched row. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+  }): CancelablePromise<QueueReceiveResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/receive',
+      path: {
+        'organization': organization,
+        'slug': slug,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        403: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Ack a queue row (idempotent)
+   * Organization queues: Ack a queue row (idempotent). Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure.
+   * @returns void
+   * @throws ApiError
+   */
+  public static ackOrgQueueRow({
+    organization,
+    slug,
+    id,
+    idempotencyKey,
+  }: {
+    /**
+     * Organization queues: Ack a queue row (idempotent). Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * 32-hex-char opaque ID (NOT canonical UUID).
+     */
+    id: string,
+    /**
+     * Idempotency key for the POST. Stored for 24h. On replay the server
+     * returns the original response with `Idempotent-Replayed: true`.
+     *
+     */
+    idempotencyKey?: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/{id}/ack',
+      path: {
+        'organization': organization,
+        'slug': slug,
+        'id': id,
+      },
+      headers: {
+        'Idempotency-Key': idempotencyKey,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Lease ready messages from a pull-bound queue
+   * Organization queues: Lease ready messages from a pull-bound queue. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure. Leases up to `max_messages` ready messages from a queue with an
+   * enabled pull binding on this app. Each message stays hidden for the
+   * visibility timeout and is redelivered with a new attempt if it is not
+   * acked, nacked or extended in time. Unexpired leases never exceed the
+   * binding's `max_concurrency`. An empty list means nothing is ready;
+   * poll again with back-off. Authenticate with an API key carrying
+   * `queues:consume`, `deploy:write` or `admin`, or with a workload
+   * identity token for audience `gregale:queues` from a live instance of
+   * this app.
+   * @returns QueueLeaseResponse Organization queues: Lease ready messages from a pull-bound queue. Leased messages, possibly none.
+   * @throws ApiError
+   */
+  public static leaseOrgQueueMessages({
+    organization,
+    slug,
+    queue,
+    requestBody,
+  }: {
+    /**
+     * Organization queues: Lease ready messages from a pull-bound queue. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Queue name of an enabled pull binding on this app.
+     */
+    queue: string,
+    requestBody?: QueueLeaseRequest,
+  }): CancelablePromise<QueueLeaseResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/{queue}/leases',
+      path: {
+        'organization': organization,
+        'slug': slug,
+        'queue': queue,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        403: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Complete leased messages
+   * Organization queues: Complete leased messages. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure.
+   * @returns QueueLeaseReceiptsResponse Organization queues: Complete leased messages. Receipts that completed their messages, and receipts that no longer own one.
+   * @throws ApiError
+   */
+  public static ackOrgQueueLeases({
+    organization,
+    slug,
+    queue,
+    requestBody,
+  }: {
+    /**
+     * Organization queues: Complete leased messages. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Queue name of an enabled pull binding on this app.
+     */
+    queue: string,
+    requestBody: QueueLeaseReceiptsRequest,
+  }): CancelablePromise<QueueLeaseReceiptsResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/{queue}/leases:ack',
+      path: {
+        'organization': organization,
+        'slug': slug,
+        'queue': queue,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        403: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Return leased messages for a retry
+   * Organization queues: Return leased messages for a retry. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure. Applies the message's retry policy and the plan's attempt budget:
+   * the message returns to the queue after the back-off (or after
+   * `delay_seconds` if later), or moves to the dead-letter queue once the
+   * budget is spent. `error` is recorded as the attempt's last error.
+   * @returns QueueLeaseReceiptsResponse Organization queues: Return leased messages for a retry. Receipts whose messages went back for a retry or to the dead-letter queue, and receipts that no longer own one.
+   * @throws ApiError
+   */
+  public static nackOrgQueueLeases({
+    organization,
+    slug,
+    queue,
+    requestBody,
+  }: {
+    /**
+     * Organization queues: Return leased messages for a retry. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Queue name of an enabled pull binding on this app.
+     */
+    queue: string,
+    requestBody: QueueLeaseReceiptsRequest,
+  }): CancelablePromise<QueueLeaseReceiptsResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/{queue}/leases:nack',
+      path: {
+        'organization': organization,
+        'slug': slug,
+        'queue': queue,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        403: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Extend the visibility timeout of leased messages
+   * Organization queues: Extend the visibility timeout of leased messages. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure.
+   * @returns QueueLeaseReceiptsResponse Organization queues: Extend the visibility timeout of leased messages. Receipts whose visibility deadline moved, and receipts that no longer own their message.
+   * @throws ApiError
+   */
+  public static extendOrgQueueLeases({
+    organization,
+    slug,
+    queue,
+    requestBody,
+  }: {
+    /**
+     * Organization queues: Extend the visibility timeout of leased messages. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Queue name of an enabled pull binding on this app.
+     */
+    queue: string,
+    requestBody: QueueLeaseReceiptsRequest,
+  }): CancelablePromise<QueueLeaseReceiptsResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/{queue}/leases:extend',
+      path: {
+        'organization': organization,
+        'slug': slug,
+        'queue': queue,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: bad_request — generic 400 envelope. Specific codes (missing Upload-Offset header on PATCH /v1/uploads/{id}, malformed JSON body, plan cap exceeded as \`source_too_large\`) ship as the \`code\` field.`,
+        401: `code: unauthorized`,
+        403: `code: feature_not_allowed — request targets a feature the plan does not entitle (async_invoke / queues / delayed_tasks on Free).`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Read queue depth, in-flight count, and oldest pending age
+   * Organization queues: Read queue depth, in-flight count, and oldest pending age. Owners, admins, developers and viewers can read metadata. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure. Read-only depth / in-flight / oldest-pending stats. NO lease is
+   * acquired and no row is mutated — the response can be polled at
+   * any cadence without affecting drain behaviour. Free plans can
+   * call this for diagnostics even though they cannot send.
+   * @returns QueueStateResponse Organization queues: Read queue depth, in-flight count, and oldest pending age. Queue stats for the app.
+   * @throws ApiError
+   */
+  public static getOrgQueueState({
+    organization,
+    slug,
+  }: {
+    /**
+     * Organization queues: Read queue depth, in-flight count, and oldest pending age. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+  }): CancelablePromise<QueueStateResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/state',
+      path: {
+        'organization': organization,
+        'slug': slug,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: List pending queue rows without acquiring a lease
+   * Organization queues: List pending queue rows without acquiring a lease. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure. Read-only peek at pending rows, oldest first. Repeated calls
+   * return the same rows in the same order — the underlying SQL has
+   * no FOR UPDATE / FOR SHARE / advisory lock, so attempts is
+   * never incremented and no row state changes. Cursor pagination
+   * matches the existing `?before=<id>` convention. NOT equivalent
+   * to `queues/receive` — peek never leases.
+   * @returns QueuePeekResponse Organization queues: List pending queue rows without acquiring a lease. A page of pending rows.
+   * @throws ApiError
+   */
+  public static peekOrgQueue({
+    organization,
+    slug,
+    limit = 20,
+    before,
+  }: {
+    /**
+     * Organization queues: List pending queue rows without acquiring a lease. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Maximum number of rows to return; capped at 200.
+     */
+    limit?: number,
+    /**
+     * Cursor — the last id from the previous page (omit for the first page).
+     */
+    before?: string,
+  }): CancelablePromise<QueuePeekResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/peek',
+      path: {
+        'organization': organization,
+        'slug': slug,
+      },
+      query: {
+        'limit': limit,
+        'before': before,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: List queue rows that exhausted the plan's retry budget
+   * Organization queues: List queue rows that exhausted the plan's retry budget. Owners, admins and developers can configure and operate queues. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure. Read-only list of rows in `state='dead_letter'`, newest first.
+   * The drain transitions a row here once it has failed
+   * `MaxQueueAttempts` times for the app's plan (Hobby 3, Pro 10,
+   * Scale 25). NO lease is acquired and no row is mutated. Replaying
+   * a dead-letter row is out of scope for this endpoint — see
+   * `POST /v1/apps/{slug}/queues/dead_letter/{id}/replay`.
+   * @returns QueueDeadLetterResponse Organization queues: List queue rows that exhausted the plan's retry budget. A page of dead-letter rows.
+   * @throws ApiError
+   */
+  public static listOrgQueueDeadLetters({
+    organization,
+    slug,
+    limit = 20,
+    before,
+  }: {
+    /**
+     * Organization queues: List queue rows that exhausted the plan's retry budget. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Maximum number of rows to return; capped at 200.
+     */
+    limit?: number,
+    /**
+     * Cursor — the last id from the previous page (omit for the first page).
+     */
+    before?: string,
+  }): CancelablePromise<QueueDeadLetterResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/dead_letter',
+      path: {
+        'organization': organization,
+        'slug': slug,
+      },
+      query: {
+        'limit': limit,
+        'before': before,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Organization queues: Reset a dead-letter queue row back to pending
+   * Organization queues: Reset a dead-letter queue row back to pending. Owners and admins can replay dead letters. Requires current membership and the corresponding credential scope. Mutations require organization billing adoption. IDs, messages, retries and receipts survive creator erasure. Resets the row's `state` to `pending` with
+   * `attempts=0`, `last_error=null`, `due_at=now()`,
+   * `last_replayed_at=now()`. Distinct from
+   * `POST /v1/invocations/{id}/replay`, which enqueues a NEW row
+   * tagged Source=InvocationReplay. This endpoint mutates the
+   * existing row in place so the dashboard's replay history view
+   * tracks the chain on a single row id.
+   *
+   * Idempotent: a second POST after the first has succeeded
+   * finds the row in 'pending' and returns 404. The
+   * Idempotency-Key middleware (issued automatically by the SDK)
+   * covers double-POST across network retries.
+   * @returns AsyncInvokeResponse Organization queues: Reset a dead-letter queue row back to pending. Replay accepted; row is back to pending.
+   * @throws ApiError
+   */
+  public static replayOrgQueueDeadLetter({
+    organization,
+    slug,
+    id,
+  }: {
+    /**
+     * Organization queues: Reset a dead-letter queue row back to pending. Company owning the application or project.
+     */
+    organization: string,
+    /**
+     * App slug. Lowercase letters, digits, hyphens; must start and end with alnum.
+     */
+    slug: string,
+    /**
+     * Organization queues: Reset a dead-letter queue row back to pending. The invocation id of the dead-letter row to replay.
+     */
+    id: string,
+  }): CancelablePromise<AsyncInvokeResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/orgs/{organization}/apps/{slug}/queues/dead_letter/{id}/replay',
+      path: {
+        'organization': organization,
+        'slug': slug,
+        'id': id,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Read aggregate organization queue usage
+   * Read aggregate organization queue usage. Owners, admins, developers, viewers and billing seats can read counts with usage:read or admin. Requires billing adoption. Includes company queues across retained creator namespaces and excludes personal queues. Reserved async counts include all invocation sources sharing the organization cap. Pull leases use binding concurrency and do not reserve async slots.
+   * @returns OrgQueueUsageResponse Read aggregate organization queue usage. Current company queue counters and plan limits.
+   * @returns Problem Read aggregate organization queue usage. Authentication, authorization or accounting error.
+   * @throws ApiError
+   */
+  public static getOrgQueueUsage({
+    organization,
+  }: {
+    /**
+     * Read aggregate organization queue usage. Company whose aggregate queue usage is requested.
+     */
+    organization: string,
+  }): CancelablePromise<OrgQueueUsageResponse | Problem> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/orgs/{organization}/queue-usage',
+      path: {
+        'organization': organization,
+      },
+    });
+  }
+}

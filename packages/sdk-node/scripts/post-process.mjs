@@ -1,0 +1,178 @@
+// scripts/post-process.mjs — pure helpers for the gen.mjs post-processors.
+//
+// Exported so tests can import without spawning the generator. The
+// post-processors are load-bearing glue around the generator's quirks:
+//   * openapi-typescript-codegen@0.31.0 emits extensionless relative
+//     imports (`from './Foo'`); NodeNext requires explicit `.js`.
+//   * The generator emits one file per model but no models barrel.
+//   * Blob success bodies must bypass the generator's text decoder.
+//
+// These behaviours are tested by the post-process and download tests.
+
+import { readFile, readdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
+/** Stored workflow names are single path segments, including names with reserved
+ * characters. Keep the pinned generator's encoding for other route families.
+ */
+export async function patchStoredWorkflowPathEncoding(dir) {
+  const path = join(dir, 'core', 'request.ts');
+  const text = await readFile(path, 'utf8');
+  const before = 'const encoder = config.ENCODE_PATH || encodeURI;';
+  const after = "const encoder = config.ENCODE_PATH || (options.url.startsWith('/v1/apps/{slug}/workflows/stored/') ? encodeURIComponent : encodeURI);";
+  if (text.includes(after)) return;
+  if (!text.includes(before)) throw new Error('stored workflow path generator anchor missing: request.ts');
+  await writeFile(path, text.replace(before, after), 'utf8');
+}
+
+/** Preserve bytes for generated Blob downloads, including JSON metadata files.
+ * Error responses keep the normal JSON/Problem parser. Idempotent and pinned
+ * to known generator anchors so a template change cannot silently undo it.
+ */
+export async function patchBinaryResponses(dir) {
+  const rewrite = async (file, replacements) => {
+    const path = join(dir, 'core', file);
+    let text = await readFile(path, 'utf8');
+    for (const [before, after] of replacements) {
+      if (text.includes(after)) continue;
+      if (!text.includes(before)) throw new Error(`binary response generator anchor missing: ${file}`);
+      text = text.replace(before, after);
+    }
+    await writeFile(path, text, 'utf8');
+  };
+  await rewrite('ApiRequestOptions.ts', [[
+    '  readonly responseHeader?: string;',
+    "  readonly responseType?: 'blob';\n  readonly responseHeader?: string;",
+  ]]);
+  await rewrite('request.ts', [
+    ['getResponseBody = async (response: Response):', "getResponseBody = async (response: Response, responseType?: 'blob'):"],
+    ["  if (response.status !== 204) {\n    try {", "  if (response.status !== 204) {\n    if (response.ok && responseType === 'blob') {\n      return await response.blob();\n    }\n    try {"],
+    ['await getResponseBody(response);', 'await getResponseBody(response, options.responseType);'],
+  ]);
+  await patchBinaryServices(dir);
+}
+
+/** Mark generated Blob downloads in a services tree with responseType 'blob'.
+ * patchBinaryResponses does this for the full tree; the public tree, which
+ * shares the full tree's runtime core, needs only this half.
+ */
+export async function patchBinaryServices(dir) {
+  await walk(join(dir, 'services'), async (path) => {
+    if (!path.endsWith('.ts')) return;
+    const text = await readFile(path, 'utf8');
+    const patched = text.replace(
+      /(\): CancelablePromise<Blob> \{\s+return __request\(OpenAPI, \{\n)(?!\s*responseType:)/g,
+      "$1      responseType: 'blob',\n",
+    );
+    if (text !== patched) await writeFile(path, patched, 'utf8');
+  });
+}
+
+/**
+ * Point a core-less generated tree (the public GA and beta client,
+ * ADR-20261023115741) at the full tree's runtime core, so both share one
+ * OpenAPI configuration and one request implementation. Returns the number
+ * of files rewritten.
+ */
+export async function shareGeneratedCore(dir, coreImport) {
+  let changed = 0;
+  await walk(dir, async (full) => {
+    if (!full.endsWith('.ts')) return;
+    const src = await readFile(full, 'utf8');
+    const fixed = src.replace(/from '\.\.\/core\//g, `from '${coreImport}/`);
+    if (fixed !== src) {
+      await writeFile(full, fixed, 'utf8');
+      changed += 1;
+    }
+  });
+  return changed;
+}
+
+/**
+ * Walk a directory tree and rewrite extensionless relative imports
+ * from `from './Foo'` to `from './Foo.js'`. Idempotent: re-running
+ * with `.js` already present matches nothing because the captured
+ * group is excluded when it already ends in `.js`.
+ *
+ * Returns the number of files that were rewritten so callers can
+ * log progress.
+ */
+export async function rewriteImportsToJs(dir) {
+  let changed = 0;
+  await walk(dir, async (full) => {
+    if (!full.endsWith('.ts')) return;
+    const src = await readFile(full, 'utf8');
+    const fixed = src.replace(
+      /from\s+'((?:\.{1,2}\/)[^']+)'/g,
+      (m, p1) => (p1.endsWith('.js') ? m : `from '${p1}.js'`),
+    );
+    if (fixed !== src) {
+      await writeFile(full, fixed, 'utf8');
+      changed += 1;
+    }
+  });
+  return changed;
+}
+
+/**
+ * Write a barrel at `servicesDir/index.ts` that re-exports every generated
+ * service class, so `src/index.ts` follows the public spec as it changes
+ * (ADR-20261023115741). Returns the number of services written.
+ */
+export async function writeServicesBarrel(servicesDir) {
+  const files = (await readdir(servicesDir))
+    .filter((f) => f.endsWith('.ts') && f !== 'index.ts')
+    .sort();
+  const barrel = [
+    '/* generated by sdk/node/scripts/gen.mjs — do not edit */',
+    '/* istanbul ignore file */',
+    '',
+    ...files.map((f) => {
+      const name = f.replace(/\.ts$/, '');
+      return `export { ${name} } from './${name}.js';`;
+    }),
+    '',
+  ].join('\n');
+  await writeFile(join(servicesDir, 'index.ts'), barrel, 'utf8');
+  return files.length;
+}
+
+/**
+ * Write a barrel file at `modelsDir/index.ts` that re-exports every
+ * sibling `.ts` file via `export type { Foo } from './Foo.js'`. The
+ * generator emits one file per model but no barrel — this is the
+ * missing piece that lets `src/index.ts` do
+ * `export type * from './generated/models/index.js'`.
+ *
+ * Returns the number of model entries written.
+ */
+export async function writeModelsBarrel(modelsDir) {
+  const files = (await readdir(modelsDir))
+    .filter((f) => f.endsWith('.ts') && f !== 'index.ts')
+    .sort();
+  const barrel = [
+    '/* generated by sdk/node/scripts/gen.mjs — do not edit */',
+    '/* istanbul ignore file */',
+    '',
+    ...files.map((f) => {
+      const name = f.replace(/\.ts$/, '');
+      return `export type { ${name} } from './${name}.js';`;
+    }),
+    '',
+  ].join('\n');
+  await writeFile(join(modelsDir, 'index.ts'), barrel, 'utf8');
+  return files.length;
+}
+
+/** Recursive walk. Calls `onFile` for every file path under `dir`. */
+async function walk(dir, onFile) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      await walk(full, onFile);
+    } else {
+      await onFile(full);
+    }
+  }
+}

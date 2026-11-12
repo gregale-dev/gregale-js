@@ -1,0 +1,38 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+/**
+ * An organization's agent policy.
+ */
+export type OrgAgentPolicyResponse = {
+  /**
+   * Whether agents may act in the organization.
+   */
+  agents_allowed: boolean;
+  /**
+   * The capabilities agents may carry beyond inspection.
+   */
+  allowed_scopes: Array<string>;
+  /**
+   * Kinds of action every agent acting in the organization must have a person approve.
+   */
+  approval_categories?: Array<string>;
+  /**
+   * Your notification channels that get this organization's agents' approval requests.
+   */
+  approval_channels?: Array<string>;
+  /**
+   * The ceiling on every agent's monthly budget in cents, when the organization set one.
+   */
+  max_agent_budget_cents?: number;
+  /**
+   * When the policy last changed; absent for an organization that never set one.
+   */
+  updated_at?: string;
+  /**
+   * Agent connections a change revoked because the new policy no longer allows them.
+   */
+  revoked?: number;
+};
+

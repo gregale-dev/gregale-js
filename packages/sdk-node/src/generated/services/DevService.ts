@@ -1,0 +1,963 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+import type { CreateDevBridgeRequest } from '../models/CreateDevBridgeRequest.js';
+import type { CreateDevBridgeResponse } from '../models/CreateDevBridgeResponse.js';
+import type { CreateScenarioObjectsRequest } from '../models/CreateScenarioObjectsRequest.js';
+import type { CreateScenarioPostgresRequest } from '../models/CreateScenarioPostgresRequest.js';
+import type { DevBridgeActivity } from '../models/DevBridgeActivity.js';
+import type { DevBridgeSession } from '../models/DevBridgeSession.js';
+import type { DevBridgeWebhookReplay } from '../models/DevBridgeWebhookReplay.js';
+import type { DevPatchStatusResponse } from '../models/DevPatchStatusResponse.js';
+import type { DevSessionResponse } from '../models/DevSessionResponse.js';
+import type { DevSyncHistoryItem } from '../models/DevSyncHistoryItem.js';
+import type { DevSyncHistoryResponse } from '../models/DevSyncHistoryResponse.js';
+import type { InjectScenarioTestChaosRequest } from '../models/InjectScenarioTestChaosRequest.js';
+import type { InjectScenarioTestChaosResponse } from '../models/InjectScenarioTestChaosResponse.js';
+import type { ListDevBridgesResponse } from '../models/ListDevBridgesResponse.js';
+import type { RecordDevSyncRequest } from '../models/RecordDevSyncRequest.js';
+import type { RegisterScenarioTestRequest } from '../models/RegisterScenarioTestRequest.js';
+import type { RegisterScenarioTestResponse } from '../models/RegisterScenarioTestResponse.js';
+import type { ReplayDevBridgeWebhookRequest } from '../models/ReplayDevBridgeWebhookRequest.js';
+import type { ScenarioActionSnapshot } from '../models/ScenarioActionSnapshot.js';
+import type { ScenarioObjectsEvidence } from '../models/ScenarioObjectsEvidence.js';
+import type { ScenarioObjectsReceipt } from '../models/ScenarioObjectsReceipt.js';
+import type { ScenarioPostgresEvidence } from '../models/ScenarioPostgresEvidence.js';
+import type { ScenarioPostgresReceipt } from '../models/ScenarioPostgresReceipt.js';
+import type { ScenarioSuspendResumeEvidence } from '../models/ScenarioSuspendResumeEvidence.js';
+import type { ScenarioTestChaosMatchesResponse } from '../models/ScenarioTestChaosMatchesResponse.js';
+import type { SealScenarioObjectsRequest } from '../models/SealScenarioObjectsRequest.js';
+import type { SealScenarioPostgresRequest } from '../models/SealScenarioPostgresRequest.js';
+import type { SeedDevSessionFromEnvironmentBranchRequest } from '../models/SeedDevSessionFromEnvironmentBranchRequest.js';
+import type { SeedDevSessionFromEnvironmentBranchResponse } from '../models/SeedDevSessionFromEnvironmentBranchResponse.js';
+import type { UpsertDevSessionRequest } from '../models/UpsertDevSessionRequest.js';
+import type { CancelablePromise } from '../core/CancelablePromise.js';
+import { OpenAPI } from '../core/OpenAPI.js';
+import { request as __request } from '../core/request.js';
+export class DevService {
+  /**
+   * List active development sessions owned by the account.
+   * Bounded inventory. Returns at most 100 active leases, newest expiry first. Connection state is informational and unknown after observer restart or eviction. No credentials are returned.
+   * @returns ListDevBridgesResponse Active owned sessions.
+   * @throws ApiError
+   */
+  public static listDevBridges(): CancelablePromise<ListDevBridgesResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/dev/bridges',
+      errors: {
+        401: `code: unauthorized`,
+        403: `code: forbidden — caller is authenticated but lacks the required scope, OR plan_limit_trusted_signers / plan_limit_secret / etc. when the resource count would exceed the plan cap.`,
+        503: `Development bridge inventory is disabled.`,
+      },
+    });
+  }
+  /**
+   * Create a leased local service development session.
+   * Operator-gated feature. Select an owned app in an unprotected non-production project environment. Credentials are returned once; the request token routes only the selected application graph, while the attachment token connects the laptop. The lease lasts one hour.
+   * @returns CreateDevBridgeResponse Development session and one-time credentials created.
+   * @throws ApiError
+   */
+  public static createDevBridge({
+    requestBody,
+  }: {
+    requestBody: CreateDevBridgeRequest,
+  }): CancelablePromise<CreateDevBridgeResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/dev/bridges',
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `Development bridge is disabled or unavailable.`,
+      },
+    });
+  }
+  /**
+   * Inspect a development session without its credentials.
+   * @returns DevBridgeSession Owned development session metadata.
+   * @throws ApiError
+   */
+  public static getDevBridge({
+    id,
+  }: {
+    /**
+     * Opaque development session identifier returned by creation.
+     */
+    id: string,
+  }): CancelablePromise<DevBridgeSession> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/dev/bridges/{id}',
+      path: {
+        'id': id,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Revoke a development session and close its laptop connection.
+   * @returns void
+   * @throws ApiError
+   */
+  public static revokeDevBridge({
+    id,
+  }: {
+    /**
+     * Opaque development session identifier returned by creation.
+     */
+    id: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/dev/bridges/{id}',
+      path: {
+        'id': id,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Inspect recent connection and request metadata.
+   * Temporary API observer window. Queries, headers and bodies are excluded. Restart or bounded eviction clears activity; observation never authorizes routing.
+   * @returns DevBridgeActivity Bounded session activity.
+   * @throws ApiError
+   */
+  public static getDevBridgeActivity({
+    id,
+  }: {
+    /**
+     * Owned development session identifier.
+     */
+    id: string,
+  }): CancelablePromise<DevBridgeActivity> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/dev/bridges/{id}/activity',
+      path: {
+        'id': id,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        403: `code: forbidden — caller is authenticated but lacks the required scope, OR plan_limit_trusted_signers / plan_limit_secret / etc. when the resource count would exceed the plan cap.`,
+        404: `code: not_found`,
+        503: `Development bridge activity is disabled.`,
+      },
+    });
+  }
+  /**
+   * Copy one verified webhook receipt to the local service.
+   * Requires account deploy permission and the session request credential. Copies only a provider-verified receipt for the intercepted app. Creates a separate durable receipt before dispatch; the original invocation stays untouched. Repeating the same key never redispatches. An uncertain or interrupted dispatch must be inspected before explicitly requesting another copy. Provider signature headers are excluded because the original receipt already records verification.
+   * @returns DevBridgeWebhookReplay New or previously recorded development replay receipt.
+   * @throws ApiError
+   */
+  public static replayDevBridgeWebhook({
+    id,
+    requestBody,
+  }: {
+    /**
+     * Destination development session identifier.
+     */
+    id: string,
+    requestBody: ReplayDevBridgeWebhookRequest,
+  }): CancelablePromise<DevBridgeWebhookReplay> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/dev/bridges/{id}/webhook-replays',
+      path: {
+        'id': id,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        403: `Session routing credential is invalid or expired.`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+      },
+    });
+  }
+  /**
+   * Inspect an owned development webhook copy receipt.
+   * @returns DevBridgeWebhookReplay Persisted copy outcome without payload or credentials.
+   * @throws ApiError
+   */
+  public static getDevBridgeWebhookReplay({
+    id,
+    replay,
+  }: {
+    /**
+     * Owning development session identifier.
+     */
+    id: string,
+    /**
+     * Replay receipt identifier, including after session revocation.
+     */
+    replay: string,
+  }): CancelablePromise<DevBridgeWebhookReplay> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/dev/bridges/{id}/webhook-replays/{replay}',
+      path: {
+        'id': id,
+        'replay': replay,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Inspect delivery of a developer live patch.
+   * Reports whether a published developer live patch reached the running developer environment. The state is pending until an instance acknowledges it, then applied, or failed with a bounded error code. Never renews the developer lease.
+   * @returns DevPatchStatusResponse Live patch delivery state.
+   * @throws ApiError
+   */
+  public static getDevPatchStatus({
+    project,
+    generation,
+    workspaceId,
+  }: {
+    /**
+     * Project label of the developer session that published the patch.
+     */
+    project: string,
+    /**
+     * Patch generation returned in the upload response's dev_patch.generation.
+     */
+    generation: number,
+    /**
+     * Opaque local workspace identity returned by the CLI derivation.
+     */
+    workspaceId?: string,
+  }): CancelablePromise<DevPatchStatusResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/dev/sessions/{project}/patches/{generation}',
+      path: {
+        'project': project,
+        'generation': generation,
+      },
+      query: {
+        'workspace_id': workspaceId,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Create or refresh a remote developer environment.
+   * Creates one stable preview app per account, project, and developer workspace, or renews its 24-hour lease. Omitting workspace_id retains the legacy account-and-project identity.
+   * @returns DevSessionResponse Existing developer environment refreshed.
+   * @throws ApiError
+   */
+  public static upsertDevSession({
+    project,
+    requestBody,
+  }: {
+    /**
+     * Stable local project label used to derive the developer URL.
+     */
+    project: string,
+    requestBody: UpsertDevSessionRequest,
+  }): CancelablePromise<DevSessionResponse> {
+    return __request(OpenAPI, {
+      method: 'PUT',
+      url: '/v1/dev/sessions/{project}',
+      path: {
+        'project': project,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        403: `code: plan_limit_apps | plan_limit_ram | plan_limit_concurrency | plan_min_instances_not_allowed | plan_limit_secrets | plan_cron_quota | app_layer_too_large | image_egress_denied`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Inspect a remote developer environment.
+   * Returns the stable URL, app, lease expiry, and safe PostgreSQL and automatic bucket binding state of one developer environment. Unlike the upsert, this read never renews the lease or provisions resources.
+   * @returns DevSessionResponse Developer environment.
+   * @throws ApiError
+   */
+  public static getDevSession({
+    project,
+    workspaceId,
+  }: {
+    /**
+     * Stable local project label used to derive the developer URL.
+     */
+    project: string,
+    /**
+     * Opaque local workspace identity of the environment to read, as derived by the CLI. Omit only to read a legacy session.
+     */
+    workspaceId?: string,
+  }): CancelablePromise<DevSessionResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/dev/sessions/{project}',
+      path: {
+        'project': project,
+      },
+      query: {
+        'workspace_id': workspaceId,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Tear down a remote developer environment.
+   * @returns void
+   * @throws ApiError
+   */
+  public static destroyDevSession({
+    project,
+    workspaceId,
+  }: {
+    /**
+     * Stable local project label used to derive the developer URL.
+     */
+    project: string,
+    /**
+     * Opaque local workspace identity returned by the CLI derivation. Omit only to target a legacy session.
+     */
+    workspaceId?: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/dev/sessions/{project}',
+      path: {
+        'project': project,
+      },
+      query: {
+        'workspace_id': workspaceId,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Register an isolated service namespace for a scenario test.
+   * All members must be live developer sessions from this account and run. A missing sibling never resolves to production.
+   * @returns RegisterScenarioTestResponse Durable webhook capture policy registered before source deployment.
+   * @throws ApiError
+   */
+  public static registerScenarioTest({
+    runId,
+    requestBody,
+  }: {
+    /**
+     * Lowercase hexadecimal ID shared only by sessions in this test run.
+     */
+    runId: string,
+    requestBody: RegisterScenarioTestRequest,
+  }): CancelablePromise<RegisterScenarioTestResponse> {
+    return __request(OpenAPI, {
+      method: 'PUT',
+      url: '/v1/dev/test-runs/{run_id}',
+      path: {
+        'run_id': runId,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        501: `code: rehearsal_not_enabled — a requested rehearsal capability is not enabled on this installation. Retrying will not help.`,
+      },
+    });
+  }
+  /**
+   * Release a scenario test namespace after all members are destroyed.
+   * @returns void
+   * @throws ApiError
+   */
+  public static deleteScenarioTest({
+    runId,
+  }: {
+    /**
+     * Lowercase hexadecimal ID shared only by sessions in this test run.
+     */
+    runId: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/dev/test-runs/{run_id}',
+      path: {
+        'run_id': runId,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+      },
+    });
+  }
+  /**
+   * Request the enrolled after-setup suspend/resume checkpoint.
+   * Account-owned isolated run only. Managed-job checkpoints arm automatically through their original relay and return 409 here. After-setup requests are idempotent and do not repeat uncertain pauses. Complete requires original VM and collector receipts plus scheduler publication. Durable handling remains available when new enrollment is disabled.
+   * @returns ScenarioSuspendResumeEvidence Pending, complete or explicitly incomplete lifecycle evidence.
+   * @throws ApiError
+   */
+  public static beginScenarioSuspendResume({
+    runId,
+  }: {
+    /**
+     * Lowercase hexadecimal ID of this account's enrolled rehearsal run.
+     */
+    runId: string,
+  }): CancelablePromise<ScenarioSuspendResumeEvidence> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/dev/test-runs/{run_id}/suspend-resume',
+      path: {
+        'run_id': runId,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Read retained suspend/resume lifecycle receipts.
+   * Reads retained lifecycle receipts for this account without requesting execution. Pending and incomplete evidence cannot establish a successful resume. Previously enrolled receipts remain readable when new admission is disabled.
+   * @returns ScenarioSuspendResumeEvidence Current run-owned checkpoint evidence, including completed and explicitly incomplete owner receipts.
+   * @throws ApiError
+   */
+  public static getScenarioSuspendResume({
+    runId,
+  }: {
+    /**
+     * Lowercase hexadecimal ID of this account's enrolled rehearsal run.
+     */
+    runId: string,
+  }): CancelablePromise<ScenarioSuspendResumeEvidence> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/dev/test-runs/{run_id}/suspend-resume',
+      path: {
+        'run_id': runId,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Close a test run and export its supported action evidence.
+   * Waits for supported managed work to settle, then irreversibly fences new simulation relay admission and waits for owning recorders to acknowledge closing. Previously admitted requests may finish. Repeating a successful seal returns the immutable retained snapshot. Coverage includes managed webhook intent and enrolled simulated relay attempts; arbitrary direct network traffic and external queues remain outside scope.
+   * @returns ScenarioActionSnapshot Immutable complete or explicitly incomplete action snapshot. Payloads are included only in a complete inventory.
+   * @throws ApiError
+   */
+  public static sealScenarioTestActions({
+    runId,
+  }: {
+    /**
+     * Lowercase hexadecimal identity of this account's capture run.
+     */
+    runId: string,
+  }): CancelablePromise<ScenarioActionSnapshot> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/dev/test-runs/{run_id}/actions/seal',
+      path: {
+        'run_id': runId,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Create an isolated S3 fixture namespace before deploying a rehearsal workload.
+   * Disabled by default. Pins bounded fixture bytes in dedicated rehearsal tables and injects run-scoped credentials, AWS_REGION, AWS_ENDPOINT_URL_S3 and S3_BUCKET as sealed ephemeral app secrets. The private adapter never accesses managed or production buckets. Only the primary contained app and its commands receive credentials. Requires no existing deployment and complete contained simulation enrollment.
+   * @returns ScenarioObjectsReceipt Starting objects captured and private storage credentials delivered before deployment.
+   * @throws ApiError
+   */
+  public static createScenarioObjects({
+    runId,
+    requestBody,
+  }: {
+    /**
+     * Isolated rehearsal run receiving a fresh object namespace.
+     */
+    runId: string,
+    requestBody: CreateScenarioObjectsRequest,
+  }): CancelablePromise<ScenarioObjectsReceipt> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/dev/test-runs/{run_id}/objects',
+      path: {
+        'run_id': runId,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        501: `code: rehearsal_not_enabled — a requested rehearsal capability is not enabled on this installation. Retrying will not help.`,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Revoke a rehearsal namespace and remove its object bodies.
+   * Cleanup remains available with admission disabled. Missing or terminal resources succeed idempotently. A transaction fences pending requests and removes all current object bytes before acknowledging cleanup.
+   * @returns void
+   * @throws ApiError
+   */
+  public static deleteScenarioObjects({
+    runId,
+  }: {
+    /**
+     * Isolated rehearsal run receiving a fresh object namespace.
+     */
+    runId: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/dev/test-runs/{run_id}/objects',
+      path: {
+        'run_id': runId,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Fence object requests, collect final content digests, and confirm cleanup.
+   * Requires a deployment belonging to the fixture app and complete sealed action evidence. New requests are fenced before waiting for admitted requests. Unsupported operations, unfinished uploads, bounds violations, collector errors or failed cleanup cannot produce complete evidence. Evidence publication and removal of object bodies share one transaction. Completed sealing is idempotent for the same deployment.
+   * @returns ScenarioObjectsEvidence Independently collected object effects with confirmed namespace cleanup.
+   * @throws ApiError
+   */
+  public static sealScenarioObjects({
+    runId,
+    requestBody,
+  }: {
+    /**
+     * Isolated run whose object mutations are ready for independent collection.
+     */
+    runId: string,
+    requestBody: SealScenarioObjectsRequest,
+  }): CancelablePromise<ScenarioObjectsEvidence> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/dev/test-runs/{run_id}/objects/seal',
+      path: {
+        'run_id': runId,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Provision a disposable PostgreSQL fixture before deploying a rehearsal workload.
+   * Opt-in operator preview for contained warm rehearsals. Executes declared SQL as an unprivileged login on a dedicated fixture cluster, independently captures selected starting rows, and injects DATABASE_URL as a sealed ephemeral app secret. Connection URLs and passwords are never returned. One fresh database per account/run; no existing deployment, managed binding, or production snapshot is accepted.
+   * @returns ScenarioPostgresReceipt Isolated starting data captured and secret delivered before deployment.
+   * @throws ApiError
+   */
+  public static createScenarioPostgres({
+    runId,
+    requestBody,
+  }: {
+    /**
+     * Lowercase hexadecimal identity of this account's isolated rehearsal run.
+     */
+    runId: string,
+    requestBody: CreateScenarioPostgresRequest,
+  }): CancelablePromise<ScenarioPostgresReceipt> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/dev/test-runs/{run_id}/postgres',
+      path: {
+        'run_id': runId,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        501: `code: rehearsal_not_enabled — a requested rehearsal capability is not enabled on this installation. Retrying will not help.`,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Fence and remove this account's disposable PostgreSQL fixture.
+   * Cleanup remains available when enrollment is disabled. A missing journal or an already confirmed deletion succeeds. Active fixture cleanup is confirmed before returning.
+   * @returns void
+   * @throws ApiError
+   */
+  public static deleteScenarioPostgres({
+    runId,
+  }: {
+    /**
+     * Lowercase hexadecimal identity of this account's isolated rehearsal run.
+     */
+    runId: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/dev/test-runs/{run_id}/postgres',
+      path: {
+        'run_id': runId,
+      },
+      errors: {
+        401: `code: unauthorized`,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Fence PostgreSQL writes, collect final committed rows, and confirm fixture deletion.
+   * Requires complete sealed action evidence and a deployment belonging to the fixture app. Unfinished SQL, collector loss, unsupported relations, oversized evidence or failed cleanup cannot produce complete evidence. Repeating a completed seal returns its retained receipt. Lock waits are sampled; short waits may be missed. Row updates appear as a deletion and insertion in the selected row multiset.
+   * @returns ScenarioPostgresEvidence Bounded independent database evidence with confirmed cleanup.
+   * @throws ApiError
+   */
+  public static sealScenarioPostgres({
+    runId,
+    requestBody,
+  }: {
+    /**
+     * Isolated run whose database observations are ready to be fenced and collected.
+     */
+    runId: string,
+    requestBody: SealScenarioPostgresRequest,
+  }): CancelablePromise<ScenarioPostgresEvidence> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/dev/test-runs/{run_id}/postgres/seal',
+      path: {
+        'run_id': runId,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        503: `Generic 503 envelope. Used by the API capacity gate (e.g.
+        host age recipient not loaded → registry credential PUT
+        returns 503 instead of accepting plaintext).
+        `,
+      },
+    });
+  }
+  /**
+   * Install a bounded fault plan for an isolated scenario run.
+   * Rules apply only to authenticated internal service calls between registered members, expire automatically, and cannot affect production or public traffic.
+   * @returns InjectScenarioTestChaosResponse Fault plan installed.
+   * @throws ApiError
+   */
+  public static injectScenarioTestChaos({
+    runId,
+    requestBody,
+  }: {
+    /**
+     * Random lowercase hexadecimal identity shared by the run's developer sessions.
+     */
+    runId: string,
+    requestBody: InjectScenarioTestChaosRequest,
+  }): CancelablePromise<InjectScenarioTestChaosResponse> {
+    return __request(OpenAPI, {
+      method: 'PUT',
+      url: '/v1/dev/test-runs/{run_id}/chaos',
+      path: {
+        'run_id': runId,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Clear the active fault plan for an isolated scenario run.
+   * Removes the run's active faults immediately. The run must still have at least one live registered member.
+   * @returns void
+   * @throws ApiError
+   */
+  public static clearScenarioTestChaos({
+    runId,
+  }: {
+    /**
+     * Random lowercase hexadecimal identity shared by the run's developer sessions.
+     */
+    runId: string,
+  }): CancelablePromise<void> {
+    return __request(OpenAPI, {
+      method: 'DELETE',
+      url: '/v1/dev/test-runs/{run_id}/chaos',
+      path: {
+        'run_id': runId,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Read fault-match counts for the current scenario plan.
+   * Returns run-scoped counts of HTTP requests and TCP connections matched by the current or most recently cleared fault plan.
+   * @returns ScenarioTestChaosMatchesResponse Fault-match evidence for the current plan generation.
+   * @throws ApiError
+   */
+  public static getScenarioTestChaosMatches({
+    runId,
+  }: {
+    /**
+     * Lowercase hexadecimal ID shared by all developer sessions in this scenario run.
+     */
+    runId: string,
+  }): CancelablePromise<ScenarioTestChaosMatchesResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/dev/test-runs/{run_id}/chaos/matches',
+      path: {
+        'run_id': runId,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+      },
+    });
+  }
+  /**
+   * Record a redacted edit-to-live receipt.
+   * Stores bounded phase timings for one developer deployment. Repeating the same app and deployment ID is idempotent.
+   * @returns DevSyncHistoryItem Receipt stored or already present.
+   * @throws ApiError
+   */
+  public static recordDevSync({
+    project,
+    requestBody,
+  }: {
+    /**
+     * Local project label used to locate the developer environment sync endpoint.
+     */
+    project: string,
+    requestBody: RecordDevSyncRequest,
+  }): CancelablePromise<DevSyncHistoryItem> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/dev/sessions/{project}/syncs',
+      path: {
+        'project': project,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * Seed a rehearsal member from a simulated environment branch.
+   * Deploys one workload of a simulated environment branch into the developer session of a rehearsal run. The member reuses the branch deployment's build and gets the branch's variables and secrets; managed PostgreSQL and object-storage bindings are not copied, so the rehearsal declares isolated fixtures. The deployment goes live after one boot. Repeating the request returns the deployment already seeded.
+   * @returns SeedDevSessionFromEnvironmentBranchResponse The member's deployment, priming or already live.
+   * @throws ApiError
+   */
+  public static seedDevSessionFromEnvironmentBranch({
+    project,
+    requestBody,
+  }: {
+    /**
+     * Local project label of the developer session to seed, as for PUT /v1/dev/sessions/{project}.
+     */
+    project: string,
+    requestBody: SeedDevSessionFromEnvironmentBranchRequest,
+  }): CancelablePromise<SeedDevSessionFromEnvironmentBranchResponse> {
+    return __request(OpenAPI, {
+      method: 'POST',
+      url: '/v1/dev/sessions/{project}/seed',
+      path: {
+        'project': project,
+      },
+      body: requestBody,
+      mediaType: 'application/json',
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        409: `code: conflict`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+  /**
+   * List bounded edit-to-live history.
+   * @returns DevSyncHistoryResponse Newest-first developer sync history and trend summary.
+   * @throws ApiError
+   */
+  public static listDevSyncHistory({
+    project,
+    workspaceId,
+    limit = 20,
+  }: {
+    /**
+     * Local project label used to locate the developer environment history.
+     */
+    project: string,
+    /**
+     * Opaque local workspace identity. Omit only for a legacy session.
+     */
+    workspaceId?: string,
+    /**
+     * Number of recent receipts to return.
+     */
+    limit?: number,
+  }): CancelablePromise<DevSyncHistoryResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/v1/dev/sessions/{project}/history',
+      path: {
+        'project': project,
+      },
+      query: {
+        'workspace_id': workspaceId,
+        'limit': limit,
+      },
+      errors: {
+        400: `code: validation_failed | source_invalid | build_undetected | handler_missing | image_required | cron_invalid | secret_invalid_key`,
+        401: `code: unauthorized`,
+        404: `code: not_found`,
+        429: `429 application/problem+json response. Authentication throttling uses
+        \`auth_rate_limited\`; plan and usage limits use their specific stable
+        codes such as \`plan_limit_concurrency\`, \`quota_exhausted\` and
+        \`profile_investigation_limit\`.
+        `,
+      },
+    });
+  }
+}
