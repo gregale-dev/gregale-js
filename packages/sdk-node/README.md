@@ -4978,3 +4978,37 @@ atomically commit business changes and typed effect receipts. `createCompensatio
 adds planning to the durable tool lifecycle. Current authorization and application
 row-version guards preserve later edits. See [setup, limits and recovery](https://github.com/poyrazK/faas/blob/main/docs/sdk-pipeline-compensations.md)
 and the [CSV cleanup journey](https://github.com/poyrazK/faas/blob/main/examples/sdk-csv-jobs/README.md#reviewed-cleanup-after-report-failure).
+
+## Typed outbound actions (preview)
+
+`defineOutboundAction` combines immutable typed intents, exact human approval and
+one acknowledged external dispatch claim. `stripeRefundActionProvider` calls a
+pinned Stripe account through the existing credential relay and reconciles lost
+responses through provider reads. `createOutboundActionMCP` adds preparation and
+current action observations to the durable workflow lifecycle. See
+[setup, authorization and recovery](https://github.com/poyrazK/faas/blob/main/docs/sdk-outbound-actions.md) and the
+[paid CSV refund journey](https://github.com/poyrazK/faas/blob/main/examples/sdk-csv-jobs/README.md#approved-refunds-after-paid-import-failure).
+
+## Typed query tools and resources (preview)
+
+`defineQueryTool` exposes existing typed read handlers with current authorization,
+signed cross-language cursors, lazy pages/items and total deadlines.
+`defineQueryResource` and `createQueryToolMCP` add authorized UTF-8 resource reads,
+resource templates and typed MCP search/read results. See [setup and limits](https://github.com/poyrazK/faas/blob/main/docs/sdk-query-tools.md) and the
+[CSV recovery context](https://github.com/poyrazK/faas/blob/main/examples/sdk-csv-jobs/README.md#query-context-before-recovery).
+
+## Deployable application toolkits (preview)
+
+`createApplicationToolkit` publishes selected typed queries, resources, pipelines, and approved
+actions under per-operation OAuth scopes. Register the resulting catalog with
+the existing MCP starter. See the [application toolkit guide](https://github.com/poyrazK/faas/blob/main/docs/sdk-application-toolkits.md).
+
+## Resumable work inbox (preview)
+
+`defineWorkInbox` finds currently authorized pipeline receipts and external action
+results without saved request IDs. Use it directly or mount its typed query
+adapter as `work_inbox`. See [setup and recovery](https://github.com/poyrazK/faas/blob/main/docs/sdk-work-inbox.md).
+Use `watchWorkInbox` to follow one owned business record over a private
+realtime subscription. See [watcher setup](https://github.com/poyrazK/faas/blob/main/docs/sdk-live-work-inbox.md).
+Use `resolveWorkInboxFollowUp` to get the current review or tool call for an entry.
+See [typed inbox follow-ups](https://github.com/poyrazK/faas/blob/main/docs/sdk-work-inbox-follow-ups.md).
